@@ -22,7 +22,7 @@ jobs:
     steps:
     # Step 1: Check out the repository
     - name: Check out code
-    - uses: actions/checkout@v4
+      uses: actions/checkout@v4
 
     # Step 2: Set up JDK (Java Development Kit)
     - name: Set up JDK 17
