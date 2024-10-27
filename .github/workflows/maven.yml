@@ -13,12 +13,33 @@ on:
     branches: [ "master" ]
   pull_request:
     branches: [ "master" ]
-
+    
+# Define the workflow for building and testing the application
 jobs:
   build:
-
+    # Specify the environment where the job will run
     runs-on: ubuntu-latest
 
+    # Define services that this job will use
+    services:
+      mysql:
+        # Use MySQL version 8 as the service image
+        image: mysql:8
+        # Map the MySQL port to the host
+        ports:
+          - 3306:3306
+        # Set environment variables for the MySQL service
+        env:
+          MYSQL_ROOT_PASSWORD: root_password  # Root password for MySQL
+          MYSQL_DATABASE: fms   # Default database to create
+          
+        # Options to check the health of the MySQL service
+        options: --health-cmd="mysqladmin ping" \
+                 --health-interval=10s \         
+                 --health-timeout=5s \           
+                 --health-retries=3                
+
+    # Define the steps that will be executed in this job
     steps:
     # Step 1: Check out the repository
     - name: Check out code
@@ -32,10 +53,18 @@ jobs:
         distribution: 'temurin'
         cache: maven
 
-    #Step 3: Build and test with Maven
-    - name: Build with Maven
-      run: mvn -B package --file pom.xml
+   # Step to set up environment variables for database connection
+    - name: Set up environment variables
+      env:
+       DB_URL: jdbc:mysql://localhost:3306/fms  # JDBC URL for connecting to MySQL
+       DB_USERNAME: root                        # Database username
+       DB_PASSWORD: root_password                # Database password
 
-    # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
+   # Step to build and test the application
+    - name: Build and Test
+      run: |
+       ./mvnw clean test  # Use Maven wrapper to clean and run tests
+          
+   # Optional: Uploads the full dependency graph to GitHub to improve the quality of Dependabot alerts this repository can receive
     - name: Update dependency graph
       uses: advanced-security/maven-dependency-submission-action@571e99aab1055c2e71a1e2309b9691de18d6b7d6
