@@ -22,7 +22,7 @@ jobs:
 
     # Define services that this job will use
     services:
-      mysql:
+      mysql_service:
         # Use MySQL version 8 as the service image
         image: mysql:8
         # Map the MySQL port to the host
@@ -34,7 +34,7 @@ jobs:
           MYSQL_DATABASE: fms                   # Default database to create
           
         # Options to check the health of the MySQL service
-        options: --health-cmd="mysqladmin ping" \
+        options: --health-cmd="mysqladmin alive" \
                  --health-interval=10s \         
                  --health-timeout=5s \           
                  --health-retries=3                
